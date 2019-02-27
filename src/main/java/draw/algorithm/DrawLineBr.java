@@ -2,11 +2,14 @@ package draw.algorithm;
 
 
 
+import cg_models.Point;
 import draw.MyImage;
 
 import java.awt.*;
 
 public class DrawLineBr implements DrawLine {
+
+
 
     public void draw(Integer x0, Integer x1, Integer y0, Integer y1, MyImage image, Color color) {
         int dx = x1 - x0;
