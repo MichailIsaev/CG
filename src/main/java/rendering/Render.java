@@ -23,20 +23,14 @@ public class Render {
 
         File file = new File("src/main/resources/deer.obj");
         Rendering rendering = new RenderingImpl();
-        try
-        {
+        try {
             rendering.render();
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        try
-        {
+            rendering.raster();
+
             rendering.save(new File("out.png"));
-        }
-        catch (IOException e)
-        {
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
