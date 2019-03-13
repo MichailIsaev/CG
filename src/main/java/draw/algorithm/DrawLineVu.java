@@ -1,8 +1,6 @@
 package draw.algorithm;
 
 
-
-import cg_models.Point;
 import draw.MyImage;
 
 import java.awt.*;

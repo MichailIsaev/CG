@@ -3,7 +3,6 @@ package rendering;
 import cg_models.Fs;
 import cg_models.OBJ;
 import cg_models.Point;
-import cg_models.Polygon;
 import draw.MyImage;
 import draw.algorithm.DrawLine;
 import draw.algorithm.DrawLineBr;
@@ -21,7 +20,7 @@ public class RenderingImpl implements Rendering
 	public RenderingImpl()
 	{
 		drawLine = new DrawLineBr();
-		file = new File("src/main/resources/deer.obj");
+		file = new File("src/main/resources/man.obj");
 		image = new MyImage(1000, 1000, BufferedImage.TYPE_INT_RGB );
 	}
 

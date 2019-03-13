@@ -18,25 +18,28 @@ class Parser {
             if (!file.exists()) throw FileNotFoundException()
 
             file.forEachLine {
-                val params = it.split(" ")
-                mapToModel(params)
+                var params = it.split(" ")
+                var key = params.first()
+                params = params.subList(params.indexOf(key) + 1, params.size)
+                mapToModel(key, params)
             }
 
             return root
         }
 
-        private fun mapToModel(params: List<String>) {
-            val key = params[0]
+        private fun mapToModel(key: String, params: List<String>) {
             when (key) {
-                "v" -> root.vs.add(Vs((params[1]).toDouble(), params[2].toDouble(), params[3].toDouble()))
+                "v" -> {
+                    val (x, y, z) = params.map { it -> it.toDouble() }.toCollection(mutableListOf())
+                    root.vs.add(Vs(x, y, z))
+                }
                 "f" -> {
-                    root.fs.add(
-                        Fs(
-                            params[1].split("/")[0].toDouble(),
-                            params[2].split("/")[0].toDouble(),
-                            params[3].split("/")[0].toDouble()
-                        )
-                    )
+                    val (x, y, z) = params.map{ it -> it.split("/")}
+                                          .map { it.first() }
+                                          .map { it -> it.toDouble() }
+                                          .toCollection(mutableListOf())
+
+                    root.fs.add(Fs(x, y, z))
                 }
                 else -> null
             }
