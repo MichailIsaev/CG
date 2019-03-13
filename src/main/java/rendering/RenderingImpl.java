@@ -46,13 +46,16 @@ public class RenderingImpl implements Rendering
 		for(Fs fs: obj.getFs()){
 			double x0 = (obj.getVs().get((int)fs.getX() - 1).getX() )*image.getWidth()/4;
 			double y0 = (obj.getVs().get((int)fs.getX() - 1).getY() )*image.getHeight()/4;
+			double z0 = (obj.getVs().get((int)fs.getX() - 1).getZ() )*image.getHeight()/4;
 			double x1 = (obj.getVs().get((int)fs.getY() - 1).getX() )*image.getWidth()/4;
 			double y1 = (obj.getVs().get((int)fs.getY() - 1).getY() )*image.getHeight()/4;
+			double z1 = (obj.getVs().get((int)fs.getY() - 1).getZ() )*image.getHeight()/4;
 			double x2 = (obj.getVs().get((int)fs.getZ() - 1).getX() )*image.getWidth()/4;
 			double y2 = (obj.getVs().get((int)fs.getZ() - 1).getY() )*image.getHeight()/4;
-			Point p1 = new Point(x0 , y0);
-			Point p2 = new Point(x1 , y1);
-			Point p3 = new Point(x2 , y2);
+			double z2 = (obj.getVs().get((int)fs.getZ() - 1).getZ() )*image.getHeight()/4;
+			Point p1 = new Point(x0 , y0 , z0);
+			Point p2 = new Point(x1 , y1 , z1);
+			Point p3 = new Point(x2 , y2 , z2);
 			polygons.add(new Polygon(p1 , p2 , p3));
 			drawLine.draw(p1 , p2 , image , Color.BLACK);
 			drawLine.draw(p1 , p3 , image , Color.BLACK);
@@ -76,6 +79,17 @@ public class RenderingImpl implements Rendering
 			/*Point p1 = new Point(x0 , y0);
 			Point p2 = new Point(x1 , y1);
 			Point p3 = new Point(x2 , y2);*/
+			Point p1 = polygon.getP1();
+			Point p2 = polygon.getP2();
+			Point p3 = polygon.getP3();
+
+			Point m = new Point((p3.getY() - p1.getY())*(p2.getZ() - p1.getZ()) - ((p3.getZ() - p1.getZ())*(p2.getY() - p1.getY())) ,
+					(p3.getZ() - p1.getZ())*(p2.getX() - p1.getX()) - (p3.getX() - p1.getX())*(p2.getZ() - p1.getZ()) ,
+					(p3.getX() - p1.getX())*(p2.getY() - p1.getY()) - (p3.getY() - p1.getY())*(p2.getX() - p1.getX()));
+			Point v = new Point(0 , 0 , 1);
+			if((m.getX()*v.getX() + m.getY()*v.getY() + m.getZ()*v.getZ()) * 4 / image.getHeight() >=0){
+				continue;
+			}
 			List<Point> points = new ArrayList();
 			int b1 = maxX(polygon);
 			int b2 = maxY(polygon);
@@ -104,7 +118,7 @@ public class RenderingImpl implements Rendering
 							* (polygon.getP1().getX() - polygon.getP2().getX()) - (polygon.getP3().getX() - polygon.getP2().getX())
 							* (polygon.getP1().getY() - polygon.getP2().getY())));
 					if(l0 >= 0 && l1 >= 0 && l2 >= 0){
-						points.add(new Point(i , j));
+						points.add(new Point(i , j , 0));
 					}
 				}
 			}
