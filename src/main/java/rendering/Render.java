@@ -6,7 +6,6 @@ import java.io.IOException;
 
 public class Render {
 
-
     public static void main(String[] args) {
 
         File file = new File("src/main/resources/man.obj");
