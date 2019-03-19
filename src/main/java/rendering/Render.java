@@ -6,13 +6,15 @@ import java.io.IOException;
 
 public class Render {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException
+    {
 
         File file = new File("src/main/resources/man.obj");
         Rendering rendering = new RenderingImpl();
         try
         {
             rendering.render();
+            ((RenderingImpl) rendering).raster();
         }
         catch (FileNotFoundException e)
         {

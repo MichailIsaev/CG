@@ -1,7 +1,6 @@
 package rendering;
 
-import cg_models.Fs;
-import cg_models.OBJ;
+import cg_models.*;
 import cg_models.Point;
 import cg_models.Polygon;
 import draw.MyImage;
@@ -21,12 +20,20 @@ import java.util.Random;
 
 public class RenderingImpl implements Rendering
 {
-	public RenderingImpl()
+	public RenderingImpl() throws IOException
 	{
 		drawLine = new DrawLineBr();
 		file = new File("src/main/resources/man.obj");
-		image = new MyImage(1000, 1000, BufferedImage.TYPE_INT_RGB );
+		image = new MyImage(2400, 2400, BufferedImage.TYPE_INT_RGB );
+
 		polygons = new ArrayList<>();
+		textures = new MyImage(1024 , 1024 , BufferedImage.TYPE_INT_RGB);
+		BufferedImage bufferedImage = ImageIO.read(new File("src/main/resources/african_head_diffuse.jpg"));
+		for(int i = - bufferedImage.getWidth() / 2 + 1 ; i < bufferedImage.getWidth() / 2 - 1 ; i++){
+			for(int j = - bufferedImage.getHeight() / 2 + 1 ; j < bufferedImage.getHeight() / 2 - 1; j++){
+				textures.setRGB(i , j , bufferedImage.getRGB(i + bufferedImage.getWidth() / 2 - 1  , j + bufferedImage.getHeight() / 2 + 1));
+			}
+		}
 	}
 
 	private MyImage image;
@@ -34,6 +41,7 @@ public class RenderingImpl implements Rendering
 	private File file;
 	private OBJ obj;
 	private List<Polygon> polygons;
+	private MyImage textures;
 
 	public void render() throws FileNotFoundException
 	{
@@ -44,15 +52,15 @@ public class RenderingImpl implements Rendering
 			}
 		}
 		for(Fs fs: obj.getFs()){
-			double x0 = (obj.getVs().get((int)fs.getX() - 1).getX() )*image.getWidth()/4;
-			double y0 = (obj.getVs().get((int)fs.getX() - 1).getY() )*image.getHeight()/4;
-            double z0 = (obj.getVs().get((int)fs.getX() - 1).getZ() );
-            double x1 = (obj.getVs().get((int)fs.getY() - 1).getX() )*image.getWidth()/4;
-			double y1 = (obj.getVs().get((int)fs.getY() - 1).getY() )*image.getHeight()/4;
-            double z1 = (obj.getVs().get((int)fs.getY() - 1).getZ() );
-            double x2 = (obj.getVs().get((int)fs.getZ() - 1).getX() )*image.getWidth()/4;
-			double y2 = (obj.getVs().get((int)fs.getZ() - 1).getY() )*image.getHeight()/4;
-            double z2 = (obj.getVs().get((int)fs.getZ() - 1).getZ() );
+			double x0 = (obj.getVs().get((int)fs.getX() - 1).getX() )*1024;
+			double y0 = (obj.getVs().get((int)fs.getX() - 1).getY() )*1024;
+            double z0 = (obj.getVs().get((int)fs.getX() - 1).getZ() )*1024;
+            double x1 = (obj.getVs().get((int)fs.getY() - 1).getX() )*1024;
+			double y1 = (obj.getVs().get((int)fs.getY() - 1).getY() )*1024;
+            double z1 = (obj.getVs().get((int)fs.getY() - 1).getZ() )*1024;
+            double x2 = (obj.getVs().get((int)fs.getZ() - 1).getX() )*1024;
+			double y2 = (obj.getVs().get((int)fs.getZ() - 1).getY() )*1024;
+            double z2 = (obj.getVs().get((int)fs.getZ() - 1).getZ() )*1024;
             Point p1 = new Point(x0 , y0, z0);
 			Point p2 = new Point(x1 , y1, z1);
 			Point p3 = new Point(x2 , y2, z2);
@@ -67,28 +75,22 @@ public class RenderingImpl implements Rendering
 	public void raster() throws FileNotFoundException {
 		//TODO: Works but must be changed
 		int z = 0;
-        List<Double> normal;
-        List<Double> surveillance;
+        Point normal;
+        Double surveillance;
         Double normalNorm,surveillanceNorm, mult;
 
 		for(Polygon polygon: polygons){
 		    z++;
 
 		    normal = polygon.normal();
-		    surveillance = polygon.surveillance();
-		    normalNorm = normal.stream().reduce((a, b) -> a + b).orElse(1.);
-		    normalNorm /= normal.size();
-            surveillanceNorm = surveillance.stream().reduce((a, b) -> a + b).orElse(1.);
-            surveillanceNorm /= surveillance.size();
+		    surveillance = normal.scMul(new Point(0 , 0 , 1));
+
 
             mult = 0.;
 
-            for(int i = 0; i < normal.size(); i++){
-		        mult += normal.get(i) * surveillance.get(i);
-            }
-
-		    double check = Math.abs((mult / normalNorm) / surveillanceNorm);
-		    if (check >= 0 && check <= 1) continue;
+            if(surveillance > 0){
+            	continue;
+			}
 
 			/*double x0 = (obj.getVs().get((int)fs.getX() - 1).getX() )*image.getWidth()/4;
 			double y0 = (obj.getVs().get((int)fs.getX() - 1).getY() )*image.getHeight()/4;
@@ -109,12 +111,14 @@ public class RenderingImpl implements Rendering
 			double l1 = 0;
 			double l2 = 0;
 			Random random = new Random();
-			int r = Math.abs(random.nextInt() % 75);
-			int g = Math.abs(random.nextInt() % 75);
-			int b = Math.abs(random.nextInt() % 75);
-
+			int r = (int) Math.abs(surveillance * 255 % 255);
+			int g = (int) Math.abs(surveillance * 255% 255);
+			int b = (int) Math.abs(surveillance * 255 % 255);
+			double zB = -Double.MAX_VALUE;
 			Color color = new Color(r , g , b);
 			//color = color.darker();
+			double tx = 0;
+			double ty;
 			for(int i = b3 ; i <= b1 ; i++){
 				for(int j = b4 ; j <= b2 ; j++){
 					l0 = (((j - polygon.getP3().getY()) * (polygon.getP2().getX() - polygon.getP3().getX()) - (i - polygon.getP3().getX())
@@ -129,9 +133,22 @@ public class RenderingImpl implements Rendering
 							* (polygon.getP1().getY() - polygon.getP2().getY())) / ((polygon.getP3().getY() - polygon.getP2().getY())
 							* (polygon.getP1().getX() - polygon.getP2().getX()) - (polygon.getP3().getX() - polygon.getP2().getX())
 							* (polygon.getP1().getY() - polygon.getP2().getY())));
-					if(l0 >= 0 && l1 >= 0 && l2 >= 0){
-						points.add(new Point(i , j, 1));
+					if(l0 < 0 || l1 < 0 || l2 < 0){
+						continue;
 					}
+					if(polygon.getP1().getZ() * l0 + polygon.getP2().getZ() * l1 + polygon.getP3().getZ() * l2 < image.getZBuffer(i , j)){
+						continue;
+					}
+					
+					
+					image.setZBudder( i , j ,polygon.getP1().getZ() * l0 + polygon.getP2().getZ() * l1 + polygon.getP3().getZ() * l2);
+					points.add(new Point(i , j, polygon.getP1().getZ() * l0 + polygon.getP2().getZ() * l1 + polygon.getP3().getZ() * l2));
+
+					
+					
+
+					
+
 				}
 			}
 			for(Point point : points){
