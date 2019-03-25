@@ -10,7 +10,22 @@ public class MyImage extends BufferedImage
 	}
 	public MyImage(int width , int height , int imageType){
 		super(width , height , imageType);
+		for(int i = 0 ; i < getHeight() ; i++){
+			for(int j = 0 ; j  < getWidth() ; j++){
+				zBuffer [i][j] =  - Double.MAX_VALUE;
+			}
+		}
 
+	}
+
+	private double[][] zBuffer = new double[getHeight()][getWidth()];
+
+	public double getZBuffer(int i , int j){
+		return this.zBuffer[this.getWidth() / 2 + i][this.getHeight() / 2 - j];
+	}
+
+	public void setZBudder(int i , int j , double element){
+		zBuffer[this.getWidth() / 2 + i][this.getHeight() / 2 - j] = element;
 	}
 
 	@Override

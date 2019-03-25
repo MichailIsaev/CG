@@ -3,6 +3,7 @@ package parser
 import cg_models.Fs
 import cg_models.OBJ
 import cg_models.Vs
+import cg_models.Vt
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -39,7 +40,20 @@ class Parser {
                                           .map { it -> it.toDouble() }
                                           .toCollection(mutableListOf())
 
-                    root.fs.add(Fs(x, y, z))
+                    val (xx, yy, zz) = params.map{ it -> it.split("/")}
+                            .map { it[1] }
+                            .map { it -> it.toDouble() }
+                            .toCollection(mutableListOf())
+                    root.fs.add(Fs(x, y, z , Vt(xx , yy, zz)))
+
+
+
+                }
+                "vt" -> {
+                    val (xx , yy , zz) = params.drop(1)
+                            .map { it -> it.toDouble() }
+                            .toCollection(mutableListOf())
+                    root.vt.add(Vt(xx , yy , zz))
                 }
                 else -> null
             }
